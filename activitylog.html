@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>Activity Log - Firebase Console</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800;900&amp;display=swap"
+    rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+    rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+    rel="stylesheet" />
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#ec5b13",
+            "background-light": "#f8f6f6",
+            "background-dark": "#221610",
+          },
+          fontFamily: {
+            "display": ["Public Sans"]
+          },
+          borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+        },
+      },
+    }
+  </script>
+  <style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+  </style>
+  <!-- global animation/background styles -->
+  <style data-purpose="custom-transitions">
+    .transition-all-300 {
+      transition: all 0.3s ease;
+    }
+
+    .opacity-0 {
+      opacity: 0;
+    }
+
+    .opacity-100 {
+      opacity: 1;
+    }
+
+    .translate-y-4 {
+      transform: translateY(1rem);
+    }
+
+    .translate-y-0 {
+      transform: translateY(0);
+    }
+
+    .transition-all {
+      transition: all 0.3s ease;
+    }
+
+    .duration-500 {
+      transition-duration: 0.5s;
+    }
+
+    .animated-bg {
+      position: fixed;
+      inset: 0;
+      z-index: -20;
+      background: radial-gradient(circle at 20% 20%, #ff9a9e, transparent 50%),
+        radial-gradient(circle at 80% 80%, #fad0c4, transparent 50%),
+        radial-gradient(circle at 50% 50%, #fbc2eb, transparent 50%);
+      background-size: 200% 200%;
+      animation: gradientShift 15s infinite alternate;
+      will-change: background-position;
+    }
+
+    @keyframes gradientShift {
+      0% {
+        background-position: 0% 0%, 100% 100%, 50% 50%;
+      }
+
+      50% {
+        background-position: 100% 0%, 0% 100%, 50% 50%;
+      }
+
+      100% {
+        background-position: 0% 100%, 100% 0%, 50% 50%;
+      }
+    }
+
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      filter: blur(100px);
+      animation: floatBlob 20s infinite;
+      will-change: transform;
+    }
+
+    @keyframes floatBlob {
+
+      0%,
+      100% {
+        transform: translate(0, 0) scale(1);
+      }
+
+      33% {
+        transform: translate(20vw, 10vh) scale(1.2);
+      }
+
+      66% {
+        transform: translate(-15vw, -15vh) scale(0.8);
+      }
+    }
+
+    .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.4);
+      border-radius: 50%;
+      animation: drift 30s linear infinite;
+      will-change: transform, opacity;
+    }
+
+    @keyframes drift {
+      from {
+        transform: translateY(0);
+        opacity: 1;
+      }
+
+      to {
+        transform: translateY(-100vh) translateX(20vw);
+        opacity: 0;
+      }
+    }
+
+    .glass {
+      background-color: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(10px);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .animated-bg {
+        background: radial-gradient(circle at 20% 20%, #1e293b, transparent 50%), radial-gradient(circle at 80% 80%, #0f172a, transparent 50%), radial-gradient(circle at 50% 50%, #334155, transparent 50%);
+      }
+
+      .particle {
+        background: rgba(255, 255, 255, 0.15);
+      }
+    }
+  </style>
+</head>
+
+<body
+  class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen relative">
+  <div class="animated-bg" aria-hidden="true"></div>
+  <div aria-hidden="true" class="pointer-events-none">
+    <div class="blob" style="width:200px;height:200px;top:10%;left:15%;animation-delay:0s;"></div>
+    <div class="blob" style="width:300px;height:300px;top:60%;left:70%;animation-delay:5s;"></div>
+    <div class="blob" style="width:250px;height:250px;top:40%;left:25%;animation-delay:10s;"></div>
+  </div>
+  <div id="particle-container" class="pointer-events-none" aria-hidden="true"></div>
+  <div class="relative flex flex-col min-h-screen w-full overflow-x-hidden">
+    <!-- Top Navigation Bar -->
+    <header
+      class="sticky top-0 z-50 w-full border-b border-slate-200 dark:border-slate-800 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md px-4 lg:px-10 py-3 animate-on-load opacity-0 translate-y-4 transition-all duration-500">
+      <div class="max-w-[1440px] mx-auto flex items-center justify-between gap-8">
+        <div class="flex items-center gap-8">
+          <div class="flex items-center gap-2 text-primary">
+            <span class="material-symbols-outlined text-3xl font-bold">local_fire_department</span>
+            <h2 class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight tracking-tight"
+              id="display-user-name">Firebase App</h2>
+          </div>
+          <nav class="hidden md:flex items-center gap-6">
+            <a class="text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary text-sm font-medium transition-colors"
+              href="home.html">Dashboard</a>
+            <a class="text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary text-sm font-medium transition-colors"
+              href="projects.html">Projects</a>
+            <a class="text-primary text-sm font-semibold border-b-2 border-primary py-1"
+              href="activitylog.html">Activity</a>
+            <a class="text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary text-sm font-medium transition-colors"
+              href="taskmanager.html">Tasks</a>
+            <a class="text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary text-sm font-medium transition-colors"
+              href="settings.html">Settings</a>
+          </nav>
+        </div>
+        <div class="flex flex-1 justify-end items-center gap-4">
+          <div
+            class="hidden sm:flex items-center bg-slate-100 dark:bg-slate-800 rounded-xl px-3 py-1.5 w-full max-w-xs border border-transparent focus-within:border-primary transition-all">
+            <span class="material-symbols-outlined text-slate-400 text-lg">search</span>
+            <input class="bg-transparent border-none focus:ring-0 text-sm w-full placeholder:text-slate-400"
+              placeholder="Search activity..." type="text" />
+          </div>
+          <div class="flex items-center gap-2">
+            <a href="activitylog.html"
+              class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-primary/10 hover:text-primary transition-all">
+              <span class="material-symbols-outlined">notifications</span>
+            </a>
+            <button id="logout-btn"
+              class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-red-500/10 hover:text-red-500 transition-all">
+              <span class="material-symbols-outlined">logout</span>
+            </button>
+          </div>
+          <a href="profile.html"
+            class="h-9 w-9 rounded-full bg-primary/20 border-2 border-primary flex items-center justify-center overflow-hidden">
+            <img class="h-full w-full object-cover" data-purpose="user-avatar"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuBGAsurIBp5zqi3wPk7dCWvQumTAfWJIIBjo2_ahva1Z7zojVueuLZ-UWKQy9sCtqZBT2z9HOc1xzYQ6BB0JxUcZBuTxo5lqPrR4AFpnf8FfmBHarIpXjCcrqHg3rsMk5nzQFjZ5W_XKOD7p1vW8GGqnA7AyY8v1tP4vZPe_yr-goPYnTcNcfVpZmJEvXWTAT7vDumzHvBkEHs74XPIZTa-vB-eW5mYaVLOQOn4_sjNDQNyYxLQGxMMx5gVAUlPf99Rbbg_MwRJpl4" />
+          </a>
+        </div>
+      </div>
+    </header>
+    <main
+      class="flex-1 max-w-[1440px] mx-auto w-full p-4 lg:p-10 flex flex-col gap-8 animate-on-load opacity-0 translate-y-4 transition-all duration-500">
+      <!-- Breadcrumbs and Header -->
+      <div class="flex flex-col gap-2">
+        <div class="flex items-center gap-2 text-xs text-slate-500 font-medium">
+          <span>Projects</span>
+          <span class="material-symbols-outlined text-xs">chevron_right</span>
+          <span class="text-primary">firebase-app-v2</span>
+        </div>
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+          <div class="flex flex-col gap-1">
+            <h1 class="text-3xl font-black tracking-tight text-slate-900 dark:text-slate-100">Activity Log</h1>
+            <p class="text-slate-500 dark:text-slate-400 text-sm">Real-time authentication and login events across your
+              production environment.</p>
+          </div>
+          <div class="flex gap-2">
+            <button
+              class="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 px-4 py-2 rounded-xl text-sm font-semibold hover:bg-slate-200 dark:hover:bg-slate-700 transition-all">
+              <span class="material-symbols-outlined text-lg">download</span> Export CSV
+            </button>
+            <button
+              class="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-xl text-sm font-semibold shadow-lg shadow-primary/20 hover:brightness-110 transition-all">
+              <span class="material-symbols-outlined text-lg">refresh</span> Refresh
+            </button>
+          </div>
+        </div>
+      </div>
+      <!-- Stats Bar -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-slate-500 text-xs font-bold uppercase tracking-wider">Total Sessions</span>
+            <span class="material-symbols-outlined text-primary">groups</span>
+          </div>
+          <div id="stat-total-sessions" class="text-2xl font-bold">...</div>
+          <div class="text-green-500 text-xs mt-1 font-medium flex items-center gap-1">
+            <span class="material-symbols-outlined text-xs">trending_up</span> +12% from last week
+          </div>
+        </div>
+        <div class="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-slate-500 text-xs font-bold uppercase tracking-wider">Unique Users</span>
+            <span class="material-symbols-outlined text-primary">person</span>
+          </div>
+          <div id="stat-unique-users" class="text-2xl font-bold">...</div>
+          <div class="text-slate-500 text-xs mt-1 font-medium">Across all platforms</div>
+        </div>
+        <div class="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-slate-500 text-xs font-bold uppercase tracking-wider">Security Alerts</span>
+            <span class="material-symbols-outlined text-red-500">warning</span>
+          </div>
+          <div id="stat-security-alerts" class="text-2xl font-bold">0</div>
+          <div class="text-green-500 text-xs mt-1 font-medium">All systems normal</div>
+        </div>
+      </div>
+      <!-- Main Table Section -->
+      <div
+        class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
+        <div
+          class="p-4 border-b border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-4 bg-slate-50/50 dark:bg-slate-800/50">
+          <div class="flex items-center gap-2">
+            <span class="text-sm font-bold">Recent Events</span>
+            <span class="bg-primary/10 text-primary text-[10px] font-bold px-2 py-0.5 rounded-full">LIVE</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <select
+              class="bg-background-light dark:bg-background-dark border-slate-200 dark:border-slate-800 rounded-lg text-xs font-medium focus:ring-primary focus:border-primary">
+              <option>All Auth Providers</option>
+              <option>Email/Password</option>
+              <option>Google</option>
+              <option>GitHub</option>
+            </select>
+            <select
+              class="bg-background-light dark:bg-background-dark border-slate-200 dark:border-slate-800 rounded-lg text-xs font-medium focus:ring-primary focus:border-primary">
+              <option>Last 24 Hours</option>
+              <option>Last 7 Days</option>
+              <option>Last 30 Days</option>
+            </select>
+          </div>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr
+                class="text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider border-b border-slate-200 dark:border-slate-800">
+                <th class="px-6 py-4">UID</th>
+                <th class="px-6 py-4">User Email</th>
+                <th class="px-6 py-4">
+                  <div class="flex items-center gap-1 cursor-pointer hover:text-primary">
+                    Login Time
+                    <span class="material-symbols-outlined text-sm">arrow_downward</span>
+                  </div>
+                </th>
+                <th class="px-6 py-4">Browser / Device</th>
+                <th class="px-6 py-4">Status</th>
+              </tr>
+            </thead>
+            <tbody id="activityTableBody" class="divide-y divide-slate-100 dark:divide-slate-800">
+              <!-- Row 1 -->
+              <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
+                <td class="px-6 py-4">
+                  <code
+                    class="text-xs bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded text-primary font-mono">a7b2...</code>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="flex flex-col">
+                    <span class="text-sm font-semibold">user1@example.com</span>
+                    <span class="text-[10px] text-slate-400">ID: 550e8400-e29b-41d4</span>
+                  </div>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="flex flex-col">
+                    <span class="text-sm">Oct 27, 2023</span>
+                    <span class="text-xs text-slate-400">14:22:01 (UTC)</span>
+                  </div>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-slate-400">laptop_mac</span>
+                    <span class="text-xs bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full font-medium">Chrome /
+                      macOS</span>
+                  </div>
+                </td>
+                <td class="px-6 py-4">
+                  <span class="flex items-center gap-1.5 text-xs font-bold text-green-600 dark:text-green-400">
+                    <span class="h-1.5 w-1.5 rounded-full bg-green-500"></span> Success
+                  </span>
+                </td>
+              </tr>
+              <!-- Row 2 -->
+              <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
+                <td class="px-6 py-4">
+                  <code
+                    class="text-xs bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded text-primary font-mono">f9e0...</code>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="flex flex-col">
+                    <span class="text-sm font-semibold">admin@domain.io</span>
+                    <span class="text-[10px] text-slate-400">ID: 123e4567-e89b-12d3</span>
+                  </div>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="flex flex-col">
+                    <span class="text-sm">Oct 27, 2023</span>
+                    <span class="text-xs text-slate-400">13:05:12 (UTC)</span>
+                  </div>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-slate-400">window</span>
+                    <span class="text-xs bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full font-medium">Firefox /
+                      Windows</span>
+                  </div>
+                </td>
+                <td class="px-6 py-4">
+                  <span class="flex items-center gap-1.5 text-xs font-bold text-green-600 dark:text-green-400">
+                    <span class="h-1.5 w-1.5 rounded-full bg-green-500"></span> Success
+                  </span>
+                </td>
+              </tr>
+              <!-- Row 3 -->
+              <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
+                <td class="px-6 py-4">
+                  <code
+                    class="text-xs bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded text-primary font-mono">k3l1...</code>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="flex flex-col">
+                    <span class="text-sm font-semibold">dev_test@gmail.com</span>
+                    <span class="text-[10px] text-slate-400">ID: 7d8f9a2b-c1e0-4f5a</span>
+                  </div>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="flex flex-col">
+                    <span class="text-sm">Oct 27, 2023</span>
+                    <span class="text-xs text-slate-400">11:45:30 (UTC)</span>
+                  </div>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-slate-400">smartphone</span>
+                    <span class="text-xs bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full font-medium">Safari /
+                      iOS</span>
+                  </div>
+                </td>
+                <td class="px-6 py-4">
+                  <span class="flex items-center gap-1.5 text-xs font-bold text-red-600 dark:text-red-400">
+                    <span class="h-1.5 w-1.5 rounded-full bg-red-500"></span> Failed
+                  </span>
+                </td>
+              </tr>
+              <!-- Row 4 -->
+              <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
+                <td class="px-6 py-4">
+                  <code
+                    class="text-xs bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded text-primary font-mono">p5r8...</code>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="flex flex-col">
+                    <span class="text-sm font-semibold">support@app.com</span>
+                    <span class="text-[10px] text-slate-400">ID: a1b2c3d4-e5f6-g7h8</span>
+                  </div>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="flex flex-col">
+                    <span class="text-sm">Oct 27, 2023</span>
+                    <span class="text-xs text-slate-400">09:12:45 (UTC)</span>
+                  </div>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-slate-400">desktop_windows</span>
+                    <span class="text-xs bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full font-medium">Edge /
+                      Windows</span>
+                  </div>
+                </td>
+                <td class="px-6 py-4">
+                  <span class="flex items-center gap-1.5 text-xs font-bold text-green-600 dark:text-green-400">
+                    <span class="h-1.5 w-1.5 rounded-full bg-green-500"></span> Success
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <!-- Table Footer / Pagination -->
+        <div class="p-4 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between">
+          <span class="text-xs text-slate-500 font-medium">Showing 4 of 2,480 logs</span>
+          <div class="flex gap-2">
+            <button
+              class="p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-50"
+              disabled="">
+              <span class="material-symbols-outlined text-sm">chevron_left</span>
+            </button>
+            <button
+              class="p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800">
+              <span class="material-symbols-outlined text-sm">chevron_right</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <!-- Empty State / Loading Example (Hidden by default, shown for UI demonstration) -->
+      <div
+        class="hidden flex flex-col items-center justify-center py-20 bg-white dark:bg-slate-900 rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-800">
+        <div class="size-16 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-4">
+          <span class="material-symbols-outlined text-slate-400 text-3xl">search_off</span>
+        </div>
+        <h3 class="text-lg font-bold">No activity found</h3>
+        <p class="text-slate-500 text-sm max-w-xs text-center mt-1">Try adjusting your filters or search criteria to
+          find what you're looking for.</p>
+        <button class="mt-4 px-6 py-2 bg-primary text-white rounded-xl text-sm font-bold">Clear Filters</button>
+      </div>
+      <!-- Loading State Example (Hidden) -->
+      <div class="hidden flex flex-col items-center justify-center py-20">
+        <div class="h-8 w-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin"></div>
+        <p class="text-slate-500 text-sm mt-4 font-medium">Fetching latest activity...</p>
+      </div>
+      <!-- Protected Route Notification -->
+      <div class="mt-4 flex items-center gap-4 p-4 bg-primary/5 border border-primary/20 rounded-xl">
+        <span class="material-symbols-outlined text-primary">verified_user</span>
+        <div class="flex-1">
+          <h4 class="text-sm font-bold text-primary">Protected Route</h4>
+          <p class="text-xs text-slate-600 dark:text-slate-400">This page is only visible to project owners and
+            authorized developers. All access is logged.</p>
+        </div>
+        <button class="text-xs font-bold text-primary hover:underline">View Permissions</button>
+      </div>
+    </main>
+    <footer class="mt-auto border-t border-slate-200 dark:border-slate-800 py-6 px-10">
+      <div class="max-w-[1440px] mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+        <p class="text-xs text-slate-500 font-medium">© 2023 Firebase Inc. • Build with Firebase Platform</p>
+        <div class="flex gap-6">
+          <a class="text-xs text-slate-500 hover:text-primary transition-colors" href="#">Documentation</a>
+          <a class="text-xs text-slate-500 hover:text-primary transition-colors" href="#">Privacy Policy</a>
+          <a class="text-xs text-slate-500 hover:text-primary transition-colors" href="#">Status</a>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Activity log script -->
+  <script type="module">
+    import { initializeActivityLog } from './activitylog.js';
+    initializeActivityLog();
+  </script>
+
+  <!-- Animation & particle initialization -->
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      const els = document.querySelectorAll('.animate-on-load');
+      els.forEach((el, i) => {
+        setTimeout(() => {
+          el.classList.remove('opacity-0', 'translate-y-4');
+          el.classList.add('opacity-100', 'translate-y-0');
+        }, i * 100);
+      });
+      const particleContainer = document.getElementById('particle-container');
+      const count = 30;
+      for (let i = 0; i < count; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        p.style.left = Math.random() * 100 + 'vw';
+        p.style.top = Math.random() * 100 + 'vh';
+        p.style.animationDelay = Math.random() * -30 + 's';
+        particleContainer.appendChild(p);
+      }
+    });
+  </script>
+
+</body>
+
+</html>

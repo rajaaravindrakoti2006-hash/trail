@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>Login - Secure Auth System</title>
+  <!-- Tailwind CSS CDN with Plugins -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#ec5b13",
+            "background-light": "#f8f6f6",
+            "background-dark": "#110c0a",
+          },
+        },
+      },
+    }
+  </script><!-- BEGIN: Custom Styling -->
+  <style data-purpose="layout-styling">
+    body {
+      background-color: #f3f4f6;
+      /* Light gray background */
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  </style>
+  <style data-purpose="animations">
+    .fade-in {
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+
+  <!-- additional global animation/background styles -->
+  <style data-purpose="custom-transitions">
+    /* Smooth transitions for interactive elements */
+    .transition-all-300 {
+      transition: all 0.3s ease;
+    }
+
+    .opacity-0 {
+      opacity: 0;
+    }
+
+    .opacity-100 {
+      opacity: 1;
+    }
+
+    .translate-y-4 {
+      transform: translateY(1rem);
+    }
+
+    .translate-y-0 {
+      transform: translateY(0);
+    }
+
+    .transition-all {
+      transition: all 0.3s ease;
+    }
+
+    .duration-500 {
+      transition-duration: 0.5s;
+    }
+
+    /* Animated gradient mesh background */
+    .animated-bg {
+      position: fixed;
+      inset: 0;
+      z-index: -20;
+      background: radial-gradient(circle at 20% 20%, #ff9a9e, transparent 50%),
+        radial-gradient(circle at 80% 80%, #fad0c4, transparent 50%),
+        radial-gradient(circle at 50% 50%, #fbc2eb, transparent 50%);
+      background-size: 200% 200%;
+      animation: gradientShift 15s infinite alternate;
+      will-change: background-position;
+    }
+
+    @keyframes gradientShift {
+      0% {
+        background-position: 0% 0%, 100% 100%, 50% 50%;
+      }
+
+      50% {
+        background-position: 100% 0%, 0% 100%, 50% 50%;
+      }
+
+      100% {
+        background-position: 0% 100%, 100% 0%, 50% 50%;
+      }
+    }
+
+    /* Floating glowing blobs */
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      filter: blur(100px);
+      animation: floatBlob 20s infinite;
+      will-change: transform;
+    }
+
+    @keyframes floatBlob {
+
+      0%,
+      100% {
+        transform: translate(0, 0) scale(1);
+      }
+
+      33% {
+        transform: translate(20vw, 10vh) scale(1.2);
+      }
+
+      66% {
+        transform: translate(-15vw, -15vh) scale(0.8);
+      }
+    }
+
+    /* Subtle particles */
+    .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.4);
+      border-radius: 50%;
+      animation: drift 30s linear infinite;
+      will-change: transform, opacity;
+    }
+
+    @keyframes drift {
+      from {
+        transform: translateY(0);
+        opacity: 1;
+      }
+
+      to {
+        transform: translateY(-100vh) translateX(20vw);
+        opacity: 0;
+      }
+    }
+
+    /* glass helper (might not be used here) */
+    .glass {
+      background-color: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(10px);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .animated-bg {
+        background: radial-gradient(circle at 20% 20%, #1e293b, transparent 50%), radial-gradient(circle at 80% 80%, #0f172a, transparent 50%), radial-gradient(circle at 50% 50%, #334155, transparent 50%);
+      }
+
+      .particle {
+        background: rgba(255, 255, 255, 0.15);
+      }
+    }
+  </style>
+  <!-- END: Custom Styling -->
+</head>
+
+<body
+  class="bg-gray-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 font-sans min-h-screen relative overflow-x-hidden">
+  <div class="animated-bg" aria-hidden="true"></div>
+  <div aria-hidden="true" class="pointer-events-none">
+    <div class="blob" style="width:200px;height:200px;top:10%;left:15%;animation-delay:0s;"></div>
+    <div class="blob" style="width:300px;height:300px;top:60%;left:70%;animation-delay:5s;"></div>
+    <div class="blob" style="width:250px;height:250px;top:40%;left:25%;animation-delay:10s;"></div>
+  </div>
+  <div id="particle-container" class="pointer-events-none" aria-hidden="true"></div>
+  <!-- BEGIN: Main Login Container -->
+  <main class="w-full max-w-md p-6 animate-on-load opacity-0 translate-y-4 transition-all duration-500"
+    data-purpose="login-container">
+    <div
+      class="bg-white dark:bg-slate-900/90 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-slate-800 fade-in">
+      <!-- BEGIN: Header Section -->
+      <header class="text-center mb-8">
+        <div class="flex justify-center mb-4">
+          <div class="p-3 bg-indigo-100 dark:bg-indigo-900/30 rounded-full">
+            <svg class="h-8 w-8 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor"
+              viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+            </svg>
+          </div>
+        </div>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Welcome Back</h1>
+        <p class="text-gray-500 dark:text-slate-400 mt-2">Please enter your details to sign in</p>
+      </header>
+      <!-- END: Header Section -->
+      <!-- BEGIN: Login Form -->
+      <form class="space-y-6" data-purpose="auth-form" id="loginForm">
+        <!-- Error Message Display -->
+        <div
+          class="hidden p-3 text-sm text-red-600 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900/30 rounded-lg text-center"
+          id="errorMessage">
+          Invalid email or password.
+        </div>
+        <!-- Email Field -->
+        <div class="space-y-1">
+          <label class="block text-sm font-medium text-gray-700 dark:text-slate-300" for="email">Email Address</label>
+          <input
+            class="block w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-white placeholder-gray-400 shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150"
+            id="email" name="email" placeholder="name@company.com" required="" type="email" />
+        </div>
+        <!-- Password Field -->
+        <div class="space-y-1">
+          <div class="flex justify-between items-center">
+            <label class="block text-sm font-medium text-gray-700 dark:text-slate-300" for="password">Password</label>
+            <a class="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-500" href="#">Forgot
+              password?</a>
+          </div>
+          <input
+            class="block w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-white placeholder-gray-400 shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150"
+            id="password" name="password" placeholder="••••••••" required="" type="password" />
+        </div>
+        <!-- Remember Me Checkbox -->
+        <div class="flex items-center">
+          <input
+            class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 dark:border-slate-700 rounded bg-white dark:bg-slate-800"
+            id="remember-me" name="remember-me" type="checkbox" />
+          <label class="ml-2 block text-sm text-gray-700 dark:text-slate-400" for="remember-me">Remember me for 30
+            days</label>
+        </div>
+        <!-- Submit Button -->
+        <button
+          class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 transform active:scale-[0.98]"
+          type="submit">
+          Sign In
+        </button>
+      </form>
+      <!-- END: Login Form -->
+      <!-- BEGIN: Footer Section -->
+      <footer class="mt-8 pt-6 border-t border-gray-100 text-center">
+        <p class="text-sm text-gray-600">
+          Don't have an account?
+          <a class="font-bold text-indigo-600 hover:text-indigo-500 transition-colors" href="register.html">Sign Up</a>
+        </p>
+      </footer>
+      <!-- END: Footer Section -->
+    </div>
+  </main>
+  <!-- END: Main Login Container -->
+  <!-- BEGIN: Login Script -->
+  <script type="module">
+    import { initializeLoginForm, checkAuthStatus } from './login.js';
+
+    // Check if user is already logged in
+    window.addEventListener('DOMContentLoaded', function () {
+      checkAuthStatus();
+      initializeLoginForm();
+    });
+  </script>
+  <!-- END: Login Script -->
+  <!-- Animation & particle initialization -->
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      const els = document.querySelectorAll('.animate-on-load');
+      els.forEach((el, i) => {
+        setTimeout(() => {
+          el.classList.remove('opacity-0', 'translate-y-4');
+          el.classList.add('opacity-100', 'translate-y-0');
+        }, i * 100);
+      });
+
+      const particleContainer = document.getElementById('particle-container');
+      const count = 30;
+      for (let i = 0; i < count; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        p.style.left = Math.random() * 100 + 'vw';
+        p.style.top = Math.random() * 100 + 'vh';
+        p.style.animationDelay = Math.random() * -30 + 's';
+        particleContainer.appendChild(p);
+      }
+    });
+  </script>
+</body>
+
+</html>

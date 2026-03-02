@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>Create Your Account | AuthSystem</title>
+  <!-- Tailwind CSS v3 with Plugins -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <!-- BEGIN: Custom Tailwind Configuration -->
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              light: '#6366f1',
+              DEFAULT: '#4f46e5',
+              dark: '#4338ca',
+            },
+            "primary": "#ec5b13",
+            "background-light": "#f8f6f6",
+            "background-dark": "#110c0a",
+          }
+        }
+      }
+    }
+  </script>
+  <!-- END: Custom Tailwind Configuration -->
+  <!-- BEGIN: Custom Styles -->
+  <style data-purpose="layout-styles">
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+    }
+
+    /* Simple animation for error messages */
+    .error-message {
+      transition: all 0.2s ease-in-out;
+      font-size: 0.75rem;
+      margin-top: 0.25rem;
+      min-height: 1rem;
+    }
+  </style>
+  <!-- END: Custom Styles -->
+
+  <!-- global animation/background styles -->
+  <style data-purpose="custom-transitions">
+    .transition-all-300 {
+      transition: all 0.3s ease;
+    }
+
+    .opacity-0 {
+      opacity: 0;
+    }
+
+    .opacity-100 {
+      opacity: 1;
+    }
+
+    .translate-y-4 {
+      transform: translateY(1rem);
+    }
+
+    .translate-y-0 {
+      transform: translateY(0);
+    }
+
+    .transition-all {
+      transition: all 0.3s ease;
+    }
+
+    .duration-500 {
+      transition-duration: 0.5s;
+    }
+
+    .animated-bg {
+      position: fixed;
+      inset: 0;
+      z-index: -20;
+      background: radial-gradient(circle at 20% 20%, #ff9a9e, transparent 50%),
+        radial-gradient(circle at 80% 80%, #fad0c4, transparent 50%),
+        radial-gradient(circle at 50% 50%, #fbc2eb, transparent 50%);
+      background-size: 200% 200%;
+      animation: gradientShift 15s infinite alternate;
+      will-change: background-position;
+    }
+
+    @keyframes gradientShift {
+      0% {
+        background-position: 0% 0%, 100% 100%, 50% 50%;
+      }
+
+      50% {
+        background-position: 100% 0%, 0% 100%, 50% 50%;
+      }
+
+      100% {
+        background-position: 0% 100%, 100% 0%, 50% 50%;
+      }
+    }
+
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      filter: blur(100px);
+      animation: floatBlob 20s infinite;
+      will-change: transform;
+    }
+
+    @keyframes floatBlob {
+
+      0%,
+      100% {
+        transform: translate(0, 0) scale(1);
+      }
+
+      33% {
+        transform: translate(20vw, 10vh) scale(1.2);
+      }
+
+      66% {
+        transform: translate(-15vw, -15vh) scale(0.8);
+      }
+    }
+
+    .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.4);
+      border-radius: 50%;
+      animation: drift 30s linear infinite;
+      will-change: transform, opacity;
+    }
+
+    @keyframes drift {
+      from {
+        transform: translateY(0);
+        opacity: 1;
+      }
+
+      to {
+        transform: translateY(-100vh) translateX(20vw);
+        opacity: 0;
+      }
+    }
+
+    .glass {
+      background-color: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(10px);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .animated-bg {
+        background: radial-gradient(circle at 20% 20%, #1e293b, transparent 50%), radial-gradient(circle at 80% 80%, #0f172a, transparent 50%), radial-gradient(circle at 50% 50%, #334155, transparent 50%);
+      }
+
+      .particle {
+        background: rgba(255, 255, 255, 0.15);
+      }
+    }
+  </style>
+</head>
+
+<body
+  class="p-4 md:p-8 bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen relative overflow-x-hidden">
+  <div class="animated-bg" aria-hidden="true"></div>
+  <div aria-hidden="true" class="pointer-events-none">
+    <div class="blob" style="width:200px;height:200px;top:10%;left:15%;animation-delay:0s;"></div>
+    <div class="blob" style="width:300px;height:300px;top:60%;left:70%;animation-delay:5s;"></div>
+    <div class="blob" style="width:250px;height:250px;top:40%;left:25%;animation-delay:10s;"></div>
+  </div>
+  <div id="particle-container" class="pointer-events-none" aria-hidden="true"></div>
+  <!-- BEGIN: SignupContainer -->
+  <main class="w-full max-w-md animate-on-load opacity-0 translate-y-4 transition-all duration-500"
+    data-purpose="signup-card-container">
+    <div
+      class="glass-card dark:bg-slate-900/90 shadow-2xl rounded-2xl p-8 border border-white/20 dark:border-slate-800 animate-on-load opacity-0 translate-y-4 transition-all duration-500">
+      <!-- BEGIN: HeaderSection -->
+      <div class="text-center mb-8" data-purpose="form-header">
+        <div class="inline-flex items-center justify-center w-16 h-16 bg-brand/10 dark:bg-brand/20 rounded-full mb-4">
+          <svg class="w-8 h-8 text-brand dark:text-brand-light" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+            <path d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
+              stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+          </svg>
+        </div>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Create Account</h1>
+        <p class="text-gray-500 dark:text-slate-400 mt-2">Join our community today.</p>
+      </div>
+      <!-- END: HeaderSection -->
+      <!-- BEGIN: SignupForm -->
+      <form class="space-y-4" id="signupForm" novalidate="">
+        <!-- Full Name Field -->
+        <div class="space-y-1">
+          <label class="block text-sm font-medium text-gray-700 dark:text-slate-300" for="fullName">Full Name</label>
+          <input
+            class="w-full px-4 py-2 border border-gray-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-brand focus:border-brand outline-none transition-all"
+            id="fullName" name="fullName" placeholder="John Doe" required="" type="text" />
+          <div class="error-message text-red-500 opacity-0" id="nameError">Please enter your full name.</div>
+        </div>
+        <!-- Email Field -->
+        <div class="space-y-1">
+          <label class="block text-sm font-medium text-gray-700 dark:text-slate-300" for="email">Email Address</label>
+          <input
+            class="w-full px-4 py-2 border border-gray-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-brand focus:border-brand outline-none transition-all"
+            id="email" name="email" placeholder="john@example.com" required="" type="email" />
+          <div class="error-message text-red-500 opacity-0" id="emailError">Please enter a valid email address.</div>
+        </div>
+        <!-- Password Field -->
+        <div class="space-y-1">
+          <label class="block text-sm font-medium text-gray-700 dark:text-slate-300" for="password">Password</label>
+          <input
+            class="w-full px-4 py-2 border border-gray-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-brand focus:border-brand outline-none transition-all"
+            id="password" minlength="8" name="password" placeholder="••••••••" required="" type="password" />
+          <div class="error-message text-red-500 opacity-0" id="passwordError">Password must be at least 8 characters.
+          </div>
+        </div>
+        <!-- Confirm Password Field -->
+        <div class="space-y-1">
+          <label class="block text-sm font-medium text-gray-700 dark:text-slate-300" for="confirmPassword">Confirm
+            Password</label>
+          <input
+            class="w-full px-4 py-2 border border-gray-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-brand focus:border-brand outline-none transition-all"
+            id="confirmPassword" name="confirmPassword" placeholder="••••••••" required="" type="password" />
+          <div class="error-message text-red-500 opacity-0" id="confirmError">Passwords do not match.</div>
+        </div>
+        <!-- Submit Button -->
+        <button
+          class="w-full bg-brand hover:bg-brand-dark text-white font-semibold py-3 rounded-lg transition-colors duration-200 shadow-lg shadow-brand/30 active:scale-[0.98]"
+          type="submit">
+          Sign Up
+        </button>
+      </form>
+      <!-- END: SignupForm -->
+      <!-- BEGIN: FooterLinks -->
+      <div class="mt-8 text-center" data-purpose="form-footer">
+        <p class="text-sm text-gray-600 dark:text-slate-400">
+          Already have an account?
+          <a class="text-brand dark:text-brand-light font-semibold hover:underline decoration-2 underline-offset-4"
+            href="login.html">Login</a>
+        </p>
+      </div>
+      <!-- END: FooterLinks -->
+      <!-- Success Notification (Hidden by default) -->
+      <div
+        class="hidden mt-4 p-3 bg-green-100 dark:bg-green-900/20 border border-green-200 dark:border-green-900/30 text-green-700 dark:text-green-400 rounded-lg text-sm text-center"
+        id="successToast">
+        Account created successfully! Redirecting...
+      </div>
+    </div>
+  </main>
+  <!-- END: SignupContainer -->
+  <!-- BEGIN: Register Script -->
+  <script type="module">
+    import { initializeRegisterForm } from './register.js';
+
+    window.addEventListener('DOMContentLoaded', function () {
+      initializeRegisterForm();
+    });
+  </script>
+  <!-- END: Register Script -->
+  <!-- Animation & particle initialization -->
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      const els = document.querySelectorAll('.animate-on-load');
+      els.forEach((el, i) => {
+        setTimeout(() => {
+          el.classList.remove('opacity-0', 'translate-y-4');
+          el.classList.add('opacity-100', 'translate-y-0');
+        }, i * 100);
+      });
+      const particleContainer = document.getElementById('particle-container');
+      const count = 30;
+      for (let i = 0; i < count; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        p.style.left = Math.random() * 100 + 'vw';
+        p.style.top = Math.random() * 100 + 'vh';
+        p.style.animationDelay = Math.random() * -30 + 's';
+        particleContainer.appendChild(p);
+      }
+    });
+  </script>
+</body>
+
+</html>

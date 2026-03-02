@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Projects - Workspace</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ec5b13",
+                        "background-light": "#f8f6f6",
+                        "background-dark": "#110c0a",
+                    },
+                    fontFamily: { "display": ["Public Sans"] },
+                },
+            },
+        }
+    </script>
+    <style data-purpose="custom-transitions">
+        .transition-all-300 {
+            transition: all 0.3s ease;
+        }
+
+        .opacity-0 {
+            opacity: 0;
+        }
+
+        .opacity-100 {
+            opacity: 1;
+        }
+
+        .translate-y-4 {
+            transform: translateY(1rem);
+        }
+
+        .translate-y-0 {
+            transform: translateY(0);
+        }
+
+        .transition-all {
+            transition: all 0.3s ease;
+        }
+
+        .duration-500 {
+            transition-duration: 0.5s;
+        }
+
+        .animated-bg {
+            position: fixed;
+            inset: 0;
+            z-index: -20;
+            background: radial-gradient(circle at 20% 20%, #ff9a9e, transparent 50%),
+                radial-gradient(circle at 80% 80%, #fad0c4, transparent 50%),
+                radial-gradient(circle at 50% 50%, #fbc2eb, transparent 50%);
+            background-size: 200% 200%;
+            animation: gradientShift 15s infinite alternate;
+            will-change: background-position;
+        }
+
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 0%, 100% 100%, 50% 50%;
+            }
+
+            50% {
+                background-position: 100% 0%, 0% 100%, 50% 50%;
+            }
+
+            100% {
+                background-position: 0% 100%, 100% 0%, 50% 50%;
+            }
+        }
+
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            filter: blur(100px);
+            animation: floatBlob 20s infinite;
+            will-change: transform;
+        }
+
+        @keyframes floatBlob {
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            33% {
+                transform: translate(20vw, 10vh) scale(1.2);
+            }
+
+            66% {
+                transform: translate(-15vw, -15vh) scale(0.8);
+            }
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            animation: drift 30s linear infinite;
+            will-change: transform, opacity;
+        }
+
+        @keyframes drift {
+            from {
+                transform: translateY(0);
+                opacity: 1;
+            }
+
+            to {
+                transform: translateY(-100vh) translateX(20vw);
+                opacity: 0;
+            }
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .animated-bg {
+                background: radial-gradient(circle at 20% 20%, #1e293b, transparent 50%), radial-gradient(circle at 80% 80%, #0f172a, transparent 50%), radial-gradient(circle at 50% 50%, #334155, transparent 50%);
+            }
+
+            .particle {
+                background: rgba(255, 255, 255, 0.15);
+            }
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen relative font-display">
+    <div class="animated-bg" aria-hidden="true"></div>
+    <div aria-hidden="true" class="pointer-events-none">
+        <div class="blob" style="width:200px;height:200px;top:10%;left:15%;animation-delay:0s;"></div>
+        <div class="blob" style="width:300px;height:300px;top:60%;left:70%;animation-delay:5s;"></div>
+        <div class="blob" style="width:250px;height:250px;top:40%;left:25%;animation-delay:10s;"></div>
+    </div>
+    <div id="particle-container" class="pointer-events-none" aria-hidden="true"></div>
+
+    <!-- Navigation -->
+    <nav
+        class="sticky top-0 z-50 bg-white/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 animate-on-load opacity-0 translate-y-4 transition-all duration-500">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center gap-8">
+                    <a href="home.html" class="flex items-center gap-2 text-primary">
+                        <div class="bg-primary p-1.5 rounded-lg flex items-center justify-center">
+                            <span class="material-symbols-outlined text-white text-2xl">local_fire_department</span>
+                        </div>
+                        <span class="text-xl font-bold tracking-tight text-slate-900 dark:text-white">Firebase
+                            App</span>
+                    </a>
+                    <div class="hidden md:flex items-center gap-6">
+                        <a class="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary transition-colors"
+                            href="home.html">Dashboard</a>
+                        <a class="text-sm font-semibold text-primary border-b-2 border-primary py-1"
+                            href="projects.html">Projects</a>
+                        <a class="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary transition-colors"
+                            href="taskmanager.html">Tasks</a>
+                        <a class="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary transition-colors"
+                            href="activitylog.html">Activity</a>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="hidden md:flex flex-col items-end mr-2">
+                        <span class="text-sm font-semibold text-slate-700 dark:text-slate-200 leading-none"
+                            id="display-user-name">User Name</span>
+                        <span class="text-xs text-slate-400 dark:text-slate-500">Standard Account</span>
+                    </div>
+                    <a href="activitylog.html" class="p-2 text-slate-500 hover:text-primary transition-colors">
+                        <span class="material-symbols-outlined">notifications</span>
+                    </a>
+                    <button id="logout-btn" class="p-2 text-slate-500 hover:text-red-500 transition-colors">
+                        <span class="material-symbols-outlined">logout</span>
+                    </button>
+                    <a href="profile.html"
+                        class="h-9 w-9 rounded-full border-2 border-primary shadow-sm overflow-hidden">
+                        <img alt="Profile" class="h-full w-full object-cover" data-purpose="user-avatar"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuD5fCJUY-mtZRwkUcNY-F18myVfwvdLPQkz9SiE8bE42dkMkpXDjrp91tUBLC18n9CELiVrdmtYav89xwbYy-7UXcPTh2VUa94msQgi_wRS8Enm32AIsnveMyigx4hChrpZymGev3yuBFQRAqh2k5NPSsK5q_UJx3wbaYpaMfgNiJrfsfO6N7UbrT7cAKIlSEzWqCswrDPdwnycpPbHdGgQElf3mE68SdMYtpcRv4jp1kPpmSEMl7gekh20gpVJlropoRhFoQBc71Q" />
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main
+        class="max-w-6xl mx-auto px-4 py-8 sm:px-6 lg:px-8 animate-on-load opacity-0 translate-y-4 transition-all duration-500">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+            <div>
+                <h1 class="text-3xl font-black text-slate-900 dark:text-white">Projects Archive</h1>
+                <p class="text-slate-500 dark:text-slate-400 mt-1">Organize your workflow into high-level projects.</p>
+            </div>
+            <button id="openAddProjectBtn"
+                class="bg-primary hover:bg-primary/90 text-white font-bold py-2.5 px-6 rounded-xl flex items-center justify-center gap-2 transition-all transform active:scale-95 shadow-lg shadow-primary/20">
+                <span class="material-symbols-outlined text-lg">create_new_folder</span>
+                <span>New Project</span>
+            </button>
+        </div>
+
+        <!-- Project Grid -->
+        <div id="projectGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Projects will be injected here -->
+            <div id="project-loading" class="col-span-full py-20 flex flex-col items-center justify-center">
+                <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-primary mb-4"></div>
+                <p class="text-slate-500 animate-pulse">Loading projects...</p>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div id="empty-projects" class="hidden flex flex-col items-center justify-center py-20 text-center">
+            <div class="w-32 h-32 bg-primary/10 rounded-full flex items-center justify-center mb-6">
+                <span class="material-symbols-outlined text-6xl text-primary">folder_off</span>
+            </div>
+            <h3 class="text-2xl font-bold text-slate-900 dark:text-white">No Projects Found</h3>
+            <p class="text-slate-500 dark:text-slate-400 mt-2 max-w-sm">Create your first project to start organizing
+                your workspace more effectively.</p>
+        </div>
+    </main>
+
+    <!-- Add Project Modal -->
+    <div id="projectModal"
+        class="fixed inset-0 z-[60] hidden flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+        <div
+            class="bg-white dark:bg-slate-900 w-full max-w-md rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden transform transition-all">
+            <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
+                <h3 class="text-xl font-bold">New Project</h3>
+                <button id="closeModalBtn"
+                    class="text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <form id="projectForm" class="p-6 space-y-4">
+                <div class="space-y-2">
+                    <label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Project Name</label>
+                    <input id="projectName" required
+                        class="w-full px-4 py-3 rounded-xl border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+                        placeholder="e.g., Marketing Campaign 2024" />
+                </div>
+                <div class="space-y-2">
+                    <label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Description</label>
+                    <textarea id="projectDesc" rows="3"
+                        class="w-full px-4 py-3 rounded-xl border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+                        placeholder="Brief overview of the project goals..."></textarea>
+                </div>
+                <div class="pt-4 flex gap-3">
+                    <button type="button" id="cancelProjectBtn"
+                        class="flex-1 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">Cancel</button>
+                    <button type="submit"
+                        class="flex-1 px-4 py-3 rounded-xl bg-primary text-white font-bold shadow-lg shadow-primary/20 hover:brightness-110 active:scale-95 transition-all">Create
+                        Project</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeProjects } from './projects.js';
+        initializeProjects();
+    </script>
+
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            const els = document.querySelectorAll('.animate-on-load');
+            els.forEach((el, i) => {
+                setTimeout(() => {
+                    el.classList.remove('opacity-0', 'translate-y-4');
+                    el.classList.add('opacity-100', 'translate-y-0');
+                }, i * 100);
+            });
+            const particleContainer = document.getElementById('particle-container');
+            const count = 30;
+            for (let i = 0; i < count; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                p.style.left = Math.random() * 100 + 'vw';
+                p.style.top = Math.random() * 100 + 'vh';
+                p.style.animationDelay = Math.random() * -30 + 's';
+                particleContainer.appendChild(p);
+            }
+        });
+    </script>
+</body>
+
+</html>

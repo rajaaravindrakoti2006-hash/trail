@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>User Dashboard | Secure Portal</title>
+  <!-- Tailwind CSS v3 with Plugins -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#ec5b13",
+            "background-light": "#f8f6f6",
+            "background-dark": "#110c0a",
+          },
+        },
+      },
+    }
+  </script>
+  <style data-purpose="custom-transitions">
+    /* Smooth transitions for interactive elements */
+    .transition-all-300 {
+      transition: all 0.3s ease;
+    }
+
+    /* Simple fade/slide animation helpers for on‑load effects */
+    .opacity-0 {
+      opacity: 0;
+    }
+
+    .opacity-100 {
+      opacity: 1;
+    }
+
+    .translate-y-4 {
+      transform: translateY(1rem);
+    }
+
+    .translate-y-0 {
+      transform: translateY(0);
+    }
+
+    .transition-all {
+      transition: all 0.3s ease;
+    }
+
+    .duration-500 {
+      transition-duration: 0.5s;
+    }
+
+    /* Animated gradient mesh background */
+    .animated-bg {
+      position: fixed;
+      inset: 0;
+      z-index: -20;
+      background: radial-gradient(circle at 20% 20%, #ff9a9e, transparent 50%),
+        radial-gradient(circle at 80% 80%, #fad0c4, transparent 50%),
+        radial-gradient(circle at 50% 50%, #fbc2eb, transparent 50%);
+      background-size: 200% 200%;
+      animation: gradientShift 15s infinite alternate;
+      will-change: background-position;
+    }
+
+    @keyframes gradientShift {
+      0% {
+        background-position: 0% 0%, 100% 100%, 50% 50%;
+      }
+
+      50% {
+        background-position: 100% 0%, 0% 100%, 50% 50%;
+      }
+
+      100% {
+        background-position: 0% 100%, 100% 0%, 50% 50%;
+      }
+    }
+
+    /* Floating glowing blobs */
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      filter: blur(100px);
+      animation: floatBlob 20s infinite;
+      will-change: transform;
+    }
+
+    @keyframes floatBlob {
+
+      0%,
+      100% {
+        transform: translate(0, 0) scale(1);
+      }
+
+      33% {
+        transform: translate(20vw, 10vh) scale(1.2);
+      }
+
+      66% {
+        transform: translate(-15vw, -15vh) scale(0.8);
+      }
+    }
+
+    /* Subtle particles (small dots) */
+    .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.4);
+      border-radius: 50%;
+      animation: drift 30s linear infinite;
+      will-change: transform, opacity;
+    }
+
+    @keyframes drift {
+      from {
+        transform: translateY(0);
+        opacity: 1;
+      }
+
+      to {
+        transform: translateY(-100vh) translateX(20vw);
+        opacity: 0;
+      }
+    }
+
+    /* glass effect helper */
+    .glass {
+      background-color: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(10px);
+    }
+
+    .dark .glass {
+      background-color: rgba(30, 30, 30, 0.6);
+    }
+
+    /* dark-mode adjustments for background/particles */
+    @media (prefers-color-scheme: dark) {
+      .animated-bg {
+        background: radial-gradient(circle at 20% 20%, #1e293b, transparent 50%),
+          radial-gradient(circle at 80% 80%, #0f172a, transparent 50%),
+          radial-gradient(circle at 50% 50%, #334155, transparent 50%);
+      }
+
+      .particle {
+        background: rgba(255, 255, 255, 0.15);
+      }
+    }
+  </style>
+</head>
+
+<body
+  class="bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 font-sans min-h-screen relative overflow-x-hidden">
+  <!-- animated gradient mesh background -->
+  <div class="animated-bg" aria-hidden="true"></div>
+  <!-- floating blobs -->
+  <div aria-hidden="true" class="pointer-events-none">
+    <div class="blob" style="width:200px;height:200px;top:10%;left:15%;animation-delay:0s;"></div>
+    <div class="blob" style="width:300px;height:300px;top:60%;left:70%;animation-delay:5s;"></div>
+    <div class="blob" style="width:250px;height:250px;top:40%;left:25%;animation-delay:10s;"></div>
+  </div>
+  <!-- particle container populated by script -->
+  <div id="particle-container" class="pointer-events-none" aria-hidden="true"></div>
+  <!-- BEGIN: AuthGuard and Dashboard Script -->
+  <script type="module">
+    import { initializeDashboard } from './home.js';
+
+    // Initialize dashboard on page load
+    initializeDashboard();
+  </script>
+  <!-- END: AuthGuard and Dashboard Script -->
+  <!-- BEGIN: MainNavigation -->
+  <header
+    class="glass bg-white/70 dark:bg-slate-800/70 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-50 animate-on-load opacity-0 translate-y-4 transition-all duration-500">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <!-- Brand/Logo Area -->
+        <div class="flex items-center gap-2 text-primary">
+
+          <span class="text-xl font-bold tracking-tight text-slate-900 dark:text-white">Firebase App</span>
+        </div>
+        <!-- User Actions Area -->
+        <div class="flex items-center space-x-4">
+          <div class="hidden md:flex flex-col items-end mr-2">
+            <span class="text-sm font-semibold text-slate-700 dark:text-slate-200 leading-none"
+              id="display-user-name">User Name</span>
+            <span class="text-xs text-slate-400 dark:text-slate-500">Standard Account</span>
+          </div>
+          <!-- Added Notification & Profile Icons -->
+          <a href="activitylog.html" id="header-notifications"
+            class="p-2 text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 transition-colors relative">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+                stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+            </svg>
+            <span id="header-notification-count"
+              class="absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full hidden">0</span>
+          </a>
+          <a href="profile.html"
+            class="h-8 w-8 rounded-full border border-slate-200 dark:border-slate-700 overflow-hidden hover:ring-2 hover:ring-indigo-500 transition-all">
+            <img data-purpose="user-avatar"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuBGAsurIBp5zqi3wPk7dCWvQumTAfWJIIBjo2_ahva1Z7zojVueuLZ-UWKQy9sCtqZBT2z9HOc1xzYQ6BB0JxUcZBuTxo5lqPrR4AFpnf8FfmBHarIpXjCcrqHg3rsMk5nzQFjZ5W_XKOD7p1vW8GGqnA7AyY8v1tP4vZPe_yr-goPYnTcNcfVpZmJEvXWTAT7vDumzHvBkEHs74XPIZTa-vB-eW5mYaVLOQOn4_sjNDQNyYxLQGxMMx5gVAUlPf99Rbbg_MwRJpl4"
+              alt="Profile" class="h-full w-full object-cover">
+          </a>
+          <button
+            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all-300 shadow-sm"
+            data-purpose="logout-trigger" id="logout-btn">
+            Logout
+            <svg class="ml-2 -mr-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+  <!-- END: MainNavigation -->
+  <!-- BEGIN: MainDashboardContent -->
+  <main
+    class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 animate-on-load opacity-0 translate-y-4 transition-all duration-500">
+    <!-- Welcome Header Section -->
+    <section class="mb-10 animate-on-load opacity-0 translate-y-4 transition-all duration-500"
+      data-purpose="welcome-banner">
+      <div
+        class="glass bg-white/60 dark:bg-slate-800/60 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 p-8 md:p-12 relative overflow-hidden">
+        <div class="relative z-10">
+          <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-slate-100 mb-4">
+            Welcome back, <span class="text-indigo-600 dark:text-indigo-400" id="welcome-name">User</span>!
+          </h1>
+          <p class="text-lg text-slate-600 dark:text-slate-300 max-w-2xl" id="dashboard-summary">
+            Everything looks good today. You have 0 pending notifications and your security status is currently optimal.
+          </p>
+        </div>
+        <!-- Decorative background element -->
+        <div
+          class="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-indigo-50 dark:bg-indigo-900 rounded-full opacity-50 blur-3xl">
+        </div>
+      </div>
+    </section>
+    <!-- Dashboard Grid -->
+    <section class="grid grid-cols-1 md:grid-cols-3 gap-6" data-purpose="dashboard-stats">
+      <!-- Quick Info Card 1 -->
+      <article
+        class="glass bg-white/60 dark:bg-slate-800/60 p-6 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-all-300 animate-on-load opacity-0 translate-y-4 transition-all duration-500">
+        <div class="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center mb-4 text-blue-600">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round"
+              stroke-width="2"></path>
+          </svg>
+        </div>
+        <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100">Security</h3>
+        <p class="text-slate-500 dark:text-slate-300 text-sm mt-1">Your account is protected by 2FA.</p>
+      </article>
+      <!-- Quick Info Card 2 -->
+      <article
+        class="glass bg-white/60 dark:bg-slate-800/60 p-6 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-all-300 animate-on-load opacity-0 translate-y-4 transition-all duration-500">
+        <div class="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center mb-4 text-green-600">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+            <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round"
+              stroke-width="2"></path>
+          </svg>
+        </div>
+        <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100">Activity</h3>
+        <p id="last-login-text" class="text-slate-500 dark:text-slate-300 text-sm mt-1">Loading status...</p>
+      </article>
+      <!-- Quick Info Card 3 -->
+      <article
+        class="glass bg-white/60 dark:bg-slate-800/60 p-6 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-all-300 animate-on-load opacity-0 translate-y-4 transition-all duration-500">
+        <div class="w-12 h-12 bg-purple-50 rounded-lg flex items-center justify-center mb-4 text-purple-600">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+            <path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+          </svg>
+        </div>
+        <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100">Performance</h3>
+        <p class="text-slate-500 dark:text-slate-300 text-sm mt-1">All systems are operational.</p>
+      </article>
+    </section>
+
+    <!-- Quick Actions Section -->
+    <section class="mt-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6" data-purpose="quick-actions">
+      <a href="profile.html"
+        class="block glass bg-white/60 dark:bg-slate-800/60 p-6 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-all-300 animate-on-load opacity-0 translate-y-4 transition-all duration-500 text-slate-800 dark:text-slate-100">
+        <div class="w-12 h-12 bg-indigo-50 rounded-lg flex items-center justify-center mb-4 text-indigo-600">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+            <path d="M5.121 17.804A9 9 0 0112 15a9 9 0 016.879 2.804M12 11a4 4 0 100-8 4 4 0 000 8z"
+              stroke-linecap="round" stroke-linejoin="round" stroke-width="2" />
+          </svg>
+        </div>
+        <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100">Profile</h3>
+      </a>
+      <a href="settings.html"
+        class="block glass bg-white/60 dark:bg-slate-800/60 p-6 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-all-300 animate-on-load opacity-0 translate-y-4 transition-all duration-500 text-slate-800 dark:text-slate-100">
+        <div class="w-12 h-12 bg-yellow-50 rounded-lg flex items-center justify-center mb-4 text-yellow-600">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+            <path d="M12 8c-1.657 0-3 1.343-3 3s1.343 3 3 3 3-1.343 3-3-1.343-3-3-3z" stroke-linecap="round"
+              stroke-linejoin="round" stroke-width="2" />
+            <path
+              d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V20a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H4a2 2 0 010-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33h.09a1.65 1.65 0 001-1.51V4a2 2 0 014 0v.09c0 .568.223 1.112.62 1.51a1.65 1.65 0 001.82.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82v.09c.398.398.62.942.62 1.51v.1a1.65 1.65 0 001 1.51z"
+              stroke-linecap="round" stroke-linejoin="round" stroke-width="2" />
+          </svg>
+        </div>
+        <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100">Settings</h3>
+      </a>
+      <a href="activitylog.html"
+        class="block glass bg-white/60 dark:bg-slate-800/60 p-6 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-all-300 animate-on-load opacity-0 translate-y-4 transition-all duration-500 text-slate-800 dark:text-slate-100">
+        <div class="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center mb-4 text-green-600">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+            <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round"
+              stroke-width="2" />
+          </svg>
+        </div>
+        <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100">Activity Log</h3>
+      </a>
+      <a href="projects.html"
+        class="block glass bg-white/60 dark:bg-slate-800/60 p-6 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-all-300 animate-on-load opacity-0 translate-y-4 transition-all duration-500 text-slate-800 dark:text-slate-100">
+        <div class="w-12 h-12 bg-orange-50 rounded-lg flex items-center justify-center mb-4 text-orange-600">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+            <path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" stroke-linecap="round"
+              stroke-linejoin="round" stroke-width="2"></path>
+          </svg>
+        </div>
+        <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100">Projects</h3>
+      </a>
+      <a href="taskmanager.html"
+        class="block glass bg-white/60 dark:bg-slate-800/60 p-6 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-all-300 animate-on-load opacity-0 translate-y-4 transition-all duration-500 text-slate-800 dark:text-slate-100">
+        <div class="w-12 h-12 bg-purple-50 rounded-lg flex items-center justify-center mb-4 text-purple-600">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+            <path d="M9 17v-6h6v6h5v-8h3L12 3 1 9h3v8z" stroke-linecap="round" stroke-linejoin="round"
+              stroke-width="2" />
+          </svg>
+        </div>
+        <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100">Tasks</h3>
+      </a>
+    </section>
+  </main>
+  <!-- END: MainDashboardContent -->
+  <!-- BEGIN: Footer -->
+  <footer class="mt-auto py-8 border-t border-slate-200">
+    <div class="max-w-7xl mx-auto px-4 text-center">
+      <p class="text-slate-400 text-sm">
+        © 2023 SecurePortal Dashboard. All rights reserved.
+      </p>
+    </div>
+  </footer>
+  <!-- END: Footer -->
+  <!-- BEGIN: DashboardLogic -->
+  <!-- Dashboard logic now handled by home.js module -->
+  <!-- END: DashboardLogic -->
+  <!-- BEGIN: Chat Interface -->
+  <!-- Floating Chat Button -->
+  <button id="chat-toggle-btn"
+    class="fixed bottom-6 right-6 w-14 h-14 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full shadow-2xl flex items-center justify-center transition-all hover:scale-110 z-[100] focus:outline-none">
+    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z">
+      </path>
+    </svg>
+    <span id="chat-notification-count"
+      class="absolute -top-1 -right-1 w-6 h-6 bg-red-500 border-2 border-white rounded-full flex items-center justify-center text-[10px] font-bold text-white hidden">0</span>
+  </button>
+
+  <!-- Chat Window -->
+  <div id="chat-window"
+    class="fixed bottom-24 right-6 w-[380px] h-[550px] bg-white dark:bg-slate-800 rounded-2xl shadow-2xl z-[100] flex flex-col hidden transition-all-300 translate-y-4 opacity-0 border border-slate-200 dark:border-slate-700">
+    <!-- Chat Header -->
+    <div
+      class="px-5 py-4 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center bg-indigo-600 rounded-t-2xl text-white">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center font-bold"
+          id="active-chat-avatar">
+          ?
+        </div>
+        <div>
+          <h3 class="font-bold leading-tight" id="active-chat-name">Community Chat</h3>
+          <p class="text-[10px] text-indigo-100 opacity-80" id="active-chat-status">Select a user to chat</p>
+        </div>
+      </div>
+      <div class="flex items-center space-x-2">
+        <button id="video-call-btn" class="p-1 hover:bg-white/10 rounded-lg transition-colors hidden"
+          title="Start Video Call">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z">
+            </path>
+          </svg>
+        </button>
+        <button id="show-users-btn" class="p-1 hover:bg-white/10 rounded-lg transition-colors" title="User List">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z">
+            </path>
+          </svg>
+        </button>
+        <button id="close-chat-btn" class="p-1 hover:bg-white/10 rounded-lg transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- User List (Hidden by default, shown when clicking user icon) -->
+    <div id="chat-user-list" class="flex-1 overflow-y-auto hidden bg-slate-50 dark:bg-slate-900 p-2">
+      <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider px-3 py-2">Other Users</div>
+      <div id="users-container" class="space-y-1">
+        <!-- Users will be populated here -->
+        <div class="animate-pulse px-3 py-2 flex items-center space-x-3">
+          <div class="w-8 h-8 bg-slate-200 dark:bg-slate-700 rounded-full"></div>
+          <div class="h-4 bg-slate-200 dark:bg-slate-700 rounded w-24"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Messages Container -->
+    <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50 dark:bg-slate-900">
+      <div class="flex flex-col items-center justify-center h-full text-slate-400 text-sm italic">
+        <svg class="w-12 h-12 mb-3 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z">
+          </path>
+        </svg>
+        Select a user from the list to start chatting
+      </div>
+    </div>
+
+    <!-- Input Area -->
+    <div class="p-4 border-t border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 rounded-b-2xl">
+      <form id="chat-form" class="flex items-center space-x-2">
+        <input type="text" id="chat-input" placeholder="Type a message..."
+          class="flex-1 bg-slate-100 dark:bg-slate-700 border-none rounded-full px-4 py-2 text-sm focus:ring-2 focus:ring-indigo-500 dark:text-white"
+          disabled>
+        <button type="submit" id="send-btn"
+          class="p-2 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition-colors disabled:opacity-50"
+          disabled>
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8">
+            </path>
+          </svg>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script type="module" src="./chat.js"></script>
+  <!-- END: Chat Interface -->
+
+  <!-- BEGIN: Video Call Overlay -->
+  <div id="video-call-overlay"
+    class="fixed inset-0 bg-slate-900/90 z-[200] flex flex-col hidden backdrop-blur-sm animate-in fade-in duration-300">
+    <!-- Call Header -->
+    <div class="p-4 bg-slate-800 border-b border-slate-700 flex justify-between items-center text-white">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center font-bold" id="call-avatar">?
+        </div>
+        <div>
+          <h3 class="font-bold" id="call-name">Video Call</h3>
+          <p class="text-xs text-slate-400">Secure Peer-to-Peer Connection</p>
+        </div>
+      </div>
+      <button id="end-call-btn"
+        class="px-6 py-2 bg-red-600 hover:bg-red-700 text-sm font-bold rounded-full transition-all flex items-center space-x-2">
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd"
+            d="M3 5a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2h-10a2 2 0 01-2-2V5zm11 1H6v8l4-2 4 2V6z"
+            clip-rule="evenodd"></path>
+        </svg>
+        <span>End Call</span>
+      </button>
+    </div>
+    <!-- Jitsi Container -->
+    <div id="jitsi-container" class="flex-1 bg-black overflow-hidden relative">
+      <div id="call-loading-state"
+        class="absolute inset-0 flex flex-col items-center justify-center text-white space-y-4">
+        <div class="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+        <p class="text-slate-400">Connecting to secure media server...</p>
+      </div>
+    </div>
+  </div>
+  <!-- END: Video Call Overlay -->
+
+  <script src="https://meet.jit.si/external_api.js" async></script>
+  <script>
+    // animate elements marked with .animate-on-load in sequence
+    window.addEventListener('DOMContentLoaded', () => {
+      const els = document.querySelectorAll('.animate-on-load');
+      els.forEach((el, i) => {
+        setTimeout(() => {
+          el.classList.remove('opacity-0', 'translate-y-4');
+          el.classList.add('opacity-100', 'translate-y-0');
+        }, i * 100); // stagger 100ms apart
+      });
+
+      // generate subtle particle elements (pure JS but CSS handles animation)
+      const particleContainer = document.getElementById('particle-container');
+      const count = 30;
+      for (let i = 0; i < count; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        // random start position
+        p.style.left = Math.random() * 100 + 'vw';
+        p.style.top = Math.random() * 100 + 'vh';
+        p.style.animationDelay = Math.random() * -30 + 's';
+        particleContainer.appendChild(p);
+      }
+    });
+  </script>
+</body>
+
+</html>

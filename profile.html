@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>User Profile | Firebase App</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&amp;display=swap"
+    rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+    rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+    rel="stylesheet" />
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#ec5b13",
+            "background-light": "#f8f6f6",
+            "background-dark": "#221610",
+          },
+          fontFamily: {
+            "display": ["Public Sans"]
+          },
+          borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+        },
+      },
+    }
+  </script>
+  <!-- global animation/background styles -->
+  <style data-purpose="custom-transitions">
+    .transition-all-300 {
+      transition: all 0.3s ease;
+    }
+
+    .opacity-0 {
+      opacity: 0;
+    }
+
+    .opacity-100 {
+      opacity: 1;
+    }
+
+    .translate-y-4 {
+      transform: translateY(1rem);
+    }
+
+    .translate-y-0 {
+      transform: translateY(0);
+    }
+
+    .transition-all {
+      transition: all 0.3s ease;
+    }
+
+    .duration-500 {
+      transition-duration: 0.5s;
+    }
+
+    .animated-bg {
+      position: fixed;
+      inset: 0;
+      z-index: -20;
+      background: radial-gradient(circle at 20% 20%, #ff9a9e, transparent 50%),
+        radial-gradient(circle at 80% 80%, #fad0c4, transparent 50%),
+        radial-gradient(circle at 50% 50%, #fbc2eb, transparent 50%);
+      background-size: 200% 200%;
+      animation: gradientShift 15s infinite alternate;
+      will-change: background-position;
+    }
+
+    @keyframes gradientShift {
+      0% {
+        background-position: 0% 0%, 100% 100%, 50% 50%;
+      }
+
+      50% {
+        background-position: 100% 0%, 0% 100%, 50% 50%;
+      }
+
+      100% {
+        background-position: 0% 100%, 100% 0%, 50% 50%;
+      }
+    }
+
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      filter: blur(100px);
+      animation: floatBlob 20s infinite;
+      will-change: transform;
+    }
+
+    @keyframes floatBlob {
+
+      0%,
+      100% {
+        transform: translate(0, 0) scale(1);
+      }
+
+      33% {
+        transform: translate(20vw, 10vh) scale(1.2);
+      }
+
+      66% {
+        transform: translate(-15vw, -15vh) scale(0.8);
+      }
+    }
+
+    .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.4);
+      border-radius: 50%;
+      animation: drift 30s linear infinite;
+      will-change: transform, opacity;
+    }
+
+    @keyframes drift {
+      from {
+        transform: translateY(0);
+        opacity: 1;
+      }
+
+      to {
+        transform: translateY(-100vh) translateX(20vw);
+        opacity: 0;
+      }
+    }
+
+    .glass {
+      background-color: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(10px);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .animated-bg {
+        background: radial-gradient(circle at 20% 20%, #1e293b, transparent 50%), radial-gradient(circle at 80% 80%, #0f172a, transparent 50%), radial-gradient(circle at 50% 50%, #334155, transparent 50%);
+      }
+
+      .particle {
+        background: rgba(255, 255, 255, 0.15);
+      }
+    }
+  </style>
+  <style>
+    body {
+      font-family: 'Public Sans', sans-serif;
+    }
+
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+  </style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen relative">
+  <div class="animated-bg" aria-hidden="true"></div>
+  <div aria-hidden="true" class="pointer-events-none">
+    <div class="blob" style="width:200px;height:200px;top:10%;left:15%;animation-delay:0s;"></div>
+    <div class="blob" style="width:300px;height:300px;top:60%;left:70%;animation-delay:5s;"></div>
+    <div class="blob" style="width:250px;height:250px;top:40%;left:25%;animation-delay:10s;"></div>
+  </div>
+  <div id="particle-container" class="pointer-events-none" aria-hidden="true"></div>
+  <!-- Top Navigation Bar -->
+  <header
+    class="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 sticky top-0 z-50 animate-on-load opacity-0 translate-y-4 transition-all duration-500">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between h-16 items-center">
+        <div class="flex items-center gap-2">
+          <div class="bg-primary p-1.5 rounded-lg">
+            <span class="material-symbols-outlined text-white text-2xl">local_fire_department</span>
+          </div>
+          <span class="text-xl font-bold tracking-tight text-slate-900 dark:text-white" id="display-user-name">Firebase
+            App</span>
+        </div>
+        <nav class="hidden md:flex items-center gap-8">
+          <a class="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary transition-colors"
+            href="home.html">Dashboard</a>
+          <a class="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary transition-colors"
+            href="projects.html">Projects</a>
+          <a class="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary transition-colors"
+            href="taskmanager.html">Tasks</a>
+          <a class="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary transition-colors"
+            href="activitylog.html">Activity</a>
+          <a class="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary transition-colors"
+            href="settings.html">Settings</a>
+        </nav>
+        <div class="flex items-center gap-4">
+          <a href="activitylog.html" class="p-2 text-slate-500 hover:text-primary transition-colors">
+            <span class="material-symbols-outlined">notifications</span>
+          </a>
+          <button id="logout-btn"
+            class="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-red-500 flex items-center gap-1">
+            <span class="material-symbols-outlined text-lg">logout</span>
+            <span>Logout</span>
+          </button>
+          <a href="profile.html"
+            class="h-10 w-10 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden border-2 border-primary/20"
+            data-alt="User profile avatar portrait">
+            <img alt="Avatar" class="w-full h-full object-cover" data-purpose="user-avatar"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuDbWuzJbkqrgyZJqEVPcprjJOj5l0JIkaeGTKFxrtuz14nnjzmFvGJXZt2ndXNH0q-HVg9Z9QzJI9PIg6V4NgNdPtu2BNC0DK8paeHDbU9JvVERbDcEOK_DR4gTfRGs6bq6k75PmY6SbkU5yKv4U5S8UP5kxqXKipkWGDFfld0BZIfcWQNhYO_0SoBNAYERUq9dHLyUw-0yvYAoB05GHT0o4iu0gMJ7_XNmejK3FEetotHb0_zD1O8lhm3VJ-GDgnLuHx74yvHfddw" />
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+  <main
+    class="max-w-4xl mx-auto py-10 px-4 sm:px-6 lg:px-8 animate-on-load opacity-0 translate-y-4 transition-all duration-500">
+    <!-- Loading State Indicator (Protected Route Logic Simulation) -->
+    <div class="mb-8 p-4 rounded-xl bg-primary/10 border border-primary/20 flex flex-col gap-3" id="loading-overlay">
+      <div class="flex justify-between items-center">
+        <p class="text-sm font-medium text-primary flex items-center gap-2">
+          <span class="material-symbols-outlined animate-spin text-lg">sync</span>
+          Verifying session and synchronizing profile data...
+        </p>
+        <span class="text-xs font-bold text-primary">75%</span>
+      </div>
+      <div class="w-full bg-slate-200 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
+        <div class="bg-primary h-full w-3/4 transition-all duration-500"></div>
+      </div>
+    </div>
+    <!-- Feedback Messages (Toasts) -->
+    <div class="fixed top-20 right-4 z-50 flex flex-col gap-3 pointer-events-none">
+      <div id="success-toast"
+        class="hidden bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-3 animate-on-load">
+        <span class="material-symbols-outlined">check_circle</span>
+        <span class="text-sm font-medium">Profile updated successfully!</span>
+      </div>
+    </div>
+    <!-- Profile Hero Section -->
+    <div
+      class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-8 mb-8">
+      <div class="flex flex-col md:flex-row items-center gap-6">
+        <div class="relative group">
+          <div class="h-32 w-32 rounded-2xl overflow-hidden ring-4 ring-primary/10"
+            data-alt="Profile picture of a professional user">
+            <img alt="User Avatar" class="w-full h-full object-cover" data-purpose="user-avatar"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuDYYzwN_MNc7w6GdXvLx8NnWEE7Ud-O10Hs3M1T_Q291SjbUVwnVQ6hfJr3JW_ICKAe7TnkPgCzHrqU7dbS0WDGxUW9tZ1nbeNBzMN0kfOfmFL_1fOXqG3tAZtYvUYfFHG15CpG4ZyXoeV_8JcnTR-wGB51wcCUqZAj1iqByNMssSRFY8Dex0db5lx6_fArpEN7Ul8Z-vO-GUZNJdmhfu2_J9VHgb8KX9bjeUHz20mVOo6QNcUL25dhGoMcihoDv8z2xf-6KtwZGX0" />
+          </div>
+          <button
+            class="absolute -bottom-2 -right-2 bg-primary text-white p-2 rounded-xl shadow-lg hover:scale-105 transition-transform">
+            <span class="material-symbols-outlined text-sm">photo_camera</span>
+          </button>
+        </div>
+        <div class="text-center md:text-left">
+          <h1 class="text-2xl font-bold text-slate-900 dark:text-white" id="hero-name">Alex Thompson</h1>
+          <p class="text-slate-500 dark:text-slate-400" id="hero-plan">Professional Plan Member</p>
+          <div class="mt-2 flex flex-wrap justify-center md:justify-start gap-2">
+            <span
+              class="px-3 py-1 bg-primary/10 text-primary text-xs font-bold rounded-full uppercase tracking-wider">Verified
+              User</span>
+            <span
+              class="px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-500 text-xs font-bold rounded-full uppercase tracking-wider">Firebase
+              Auth</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Form Section -->
+    <div
+      class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+      <div class="px-8 py-6 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
+        <h2 class="text-lg font-bold text-slate-900 dark:text-white">Account Details</h2>
+        <span class="text-xs text-slate-500">Last updated: 2 hours ago</span>
+      </div>
+      <form class="p-8 space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Full Name Field -->
+          <div class="space-y-2">
+            <label class="text-sm font-semibold text-slate-700 dark:text-slate-300" for="fullName">Full Name</label>
+            <div class="relative group">
+              <input
+                class="w-full pl-4 pr-10 py-3 rounded-xl border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none"
+                id="fullName" name="fullName" type="text" value="Alex Thompson" />
+              <span
+                class="material-symbols-outlined absolute right-3 top-3.5 text-slate-400 group-focus-within:text-primary">edit</span>
+            </div>
+          </div>
+          <!-- Email Field (Read Only) -->
+          <div class="space-y-2">
+            <label class="text-sm font-semibold text-slate-700 dark:text-slate-300" for="email">Email Address</label>
+            <div class="relative">
+              <input
+                class="w-full px-4 py-3 rounded-xl border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-500 cursor-not-allowed outline-none"
+                id="email" name="email" readonly="" type="email" value="alex.thompson@example.com" />
+              <span class="material-symbols-outlined absolute right-3 top-3.5 text-slate-400">lock</span>
+            </div>
+            <p class="text-[10px] text-slate-400 ml-1 italic">Contact support to change email</p>
+          </div>
+          <!-- Creation Date -->
+          <div class="space-y-2">
+            <label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Account Created</label>
+            <div
+              class="flex items-center gap-3 px-4 py-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700">
+              <span class="material-symbols-outlined text-slate-400">calendar_today</span>
+              <span class="text-sm text-slate-600 dark:text-slate-300" data-purpose="created-date">October 14,
+                2023</span>
+            </div>
+          </div>
+          <!-- Last Login -->
+          <div class="space-y-2">
+            <label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Last Login</label>
+            <div
+              class="flex items-center gap-3 px-4 py-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700">
+              <span class="material-symbols-outlined text-slate-400">history</span>
+              <span class="text-sm text-slate-600 dark:text-slate-300" data-purpose="last-login">Today at 09:42
+                AM</span>
+            </div>
+          </div>
+        </div>
+        <!-- Action Bar -->
+        <div class="pt-6 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row justify-end gap-4">
+          <button
+            class="px-6 py-3 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+            type="button">
+            Cancel
+          </button>
+          <button
+            class="px-8 py-3 rounded-xl bg-primary text-white font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-all shadow-lg shadow-primary/20"
+            type="submit">
+            <span class="material-symbols-outlined text-lg animate-spin hidden">progress_activity</span>
+            <span>Update Profile</span>
+          </button>
+        </div>
+      </form>
+    </div>
+    <!-- Preferences Section -->
+    <div
+      class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden mb-8">
+      <div class="px-8 py-6 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
+        <h2 class="text-lg font-bold text-slate-900 dark:text-white">Preferences</h2>
+      </div>
+      <div class="p-8">
+        <div class="flex items-center justify-between">
+          <div class="flex flex-col">
+            <span class="text-sm font-semibold text-slate-700 dark:text-slate-300">Dark Mode</span>
+            <span class="text-xs text-slate-500 dark:text-slate-400">Switch between light and dark visual styles</span>
+          </div>
+          <button data-purpose="dark-toggle" id="dark-mode-toggle"
+            class="relative inline-flex h-6 w-11 items-center rounded-full bg-slate-200 dark:bg-primary transition-colors focus:outline-none">
+            <span
+              class="translate-x-1 dark:translate-x-6 inline-block h-4 w-4 transform rounded-full bg-white transition-transform"></span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Security Notice -->
+    <div
+      class="mt-8 flex items-start gap-4 p-4 rounded-xl bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-900/30">
+      <span class="material-symbols-outlined text-amber-500">info</span>
+      <div>
+        <h4 class="text-sm font-bold text-amber-800 dark:text-amber-400">Security Warning</h4>
+        <p class="text-xs text-amber-700/80 dark:text-amber-500/80 leading-relaxed mt-1">
+          Your account is currently linked with Google Firebase. Updating your display name here will only affect this
+          application's internal metadata.
+        </p>
+      </div>
+    </div>
+  </main>
+  <footer class="max-w-4xl mx-auto py-10 px-4 text-center border-t border-slate-200 dark:border-slate-800">
+    <p class="text-xs text-slate-500 uppercase tracking-widest">Powered by Firebase Authentication</p>
+  </footer>
+
+  <!-- Profile script -->
+  <script type="module">
+    import { initializeProfile } from './profile.js';
+    initializeProfile();
+  </script>
+
+  <!-- Animation & particle initialization -->
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      const els = document.querySelectorAll('.animate-on-load');
+      els.forEach((el, i) => {
+        setTimeout(() => {
+          el.classList.remove('opacity-0', 'translate-y-4');
+          el.classList.add('opacity-100', 'translate-y-0');
+        }, i * 100);
+      });
+      const particleContainer = document.getElementById('particle-container');
+      const count = 30;
+      for (let i = 0; i < count; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        p.style.left = Math.random() * 100 + 'vw';
+        p.style.top = Math.random() * 100 + 'vh';
+        p.style.animationDelay = Math.random() * -30 + 's';
+        particleContainer.appendChild(p);
+      }
+    });
+  </script>
+
+</body>
+
+</html>
